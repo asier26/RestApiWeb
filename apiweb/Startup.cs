@@ -30,7 +30,8 @@ namespace apiweb
             services.AddControllers();
 
             services.AddDbContext<apiwebContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("apiwebContext")));
+                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddControllers().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
