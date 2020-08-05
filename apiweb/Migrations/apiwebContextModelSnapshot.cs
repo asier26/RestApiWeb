@@ -48,10 +48,10 @@ namespace ApiWeb.Migrations
                         .HasMaxLength(100)
                         .IsUnicode(false);
 
-                    b.Property<bool?>("Estado")
+                    b.Property<bool?>("Estate")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasColumnName("Estado")
+                        .HasColumnName("Estate")
                         .HasColumnType("bit")
                         .HasDefaultValueSql("((1))");
 

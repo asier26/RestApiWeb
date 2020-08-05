@@ -23,6 +23,6 @@ namespace apiweb
         [DataType(DataType.EmailAddress)]
         [EmailAddress]
         public string Email { get; set; }
-        public bool? Estate { get; set; }
+        public bool? State { get; set; }
     }
 }

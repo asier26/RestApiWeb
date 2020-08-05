@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using apiweb;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using ApiWeb.Models;
 
 namespace apiweb.Data
 {
@@ -26,53 +27,55 @@ namespace apiweb.Data
         {
             modelBuilder.Entity<Customer>(entity =>
             {
-                entity.ToTable("Customer");
+                entity.ToTable("customer");
                 entity.HasKey(e => e.CustomerId);
-                entity.Property(e => e.CustomerId).HasColumnName("CustomerId");
+                entity.Property(e => e.CustomerId).HasColumnName("customerId");
 
                 entity.Property(e => e.PostalCode)
-                .HasColumnName("PostalCode")
+                .HasColumnName("postalCode")
                 .IsRequired()
                 .HasMaxLength(5)
                 .IsUnicode(false);
 
                 entity.Property(e => e.Name)
-                .HasColumnName("Name")
+                .HasColumnName("name")
                 .IsRequired()
                 .HasMaxLength(50)
                 .IsUnicode(false);
 
                 entity.Property(e => e.Surname)
-                .HasColumnName("Surname")
+                .HasColumnName("surname")
                 .IsRequired()
                 .HasMaxLength(50)
                 .IsUnicode(false);
 
                 entity.Property(e => e.Age)
-                .HasColumnName("Age")
+                .HasColumnName("age")
                 .IsRequired()
                 .HasMaxLength(3)
                 .IsUnicode(false);
 
                 entity.Property(e => e.Date)
-                .HasColumnName("Date")
+                .HasColumnName("date")
                 .IsRequired()
                 .HasMaxLength(20)
                 .IsUnicode(false)
                 .HasDefaultValueSql("getdate()"); ;
 
                 entity.Property(e => e.Email)
-                .HasColumnName("Email")
+                .HasColumnName("email")
                 .IsRequired()
                 .HasMaxLength(100)
                 .IsUnicode(false);
                 entity.HasIndex(e => e.Email).IsUnique();
 
-                entity.Property(e => e.Estate)
+                entity.Property(e => e.State)
                 .IsRequired()
-                .HasColumnName("Estate")
+                .HasColumnName("state")
                 .HasDefaultValueSql("((1))");
             });
         }
+
+        public DbSet<ApiWeb.Models.User> User { get; set; }
     }
 }

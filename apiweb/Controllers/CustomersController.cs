@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using apiweb;
 using apiweb.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace apiweb.Controllers
 {
+    [Authorize]
     [Route("Api/[controller]")]
     [ApiController]
     public class CustomersController : ControllerBase
@@ -54,7 +56,7 @@ namespace apiweb.Controllers
             return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
         }
 
-         // PUT: api/Customers/5
+         /*// PUT: api/Customers/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
@@ -99,7 +101,7 @@ namespace apiweb.Controllers
             await _context.SaveChangesAsync();
 
             return customer;
-        }
+        }*/
         
         private bool CustomerExists(int id)
         {
