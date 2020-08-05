@@ -37,23 +37,35 @@ namespace apiweb
             services.AddControllers().AddNewtonsoftJson();
 
             //Configuracion del Token
-            var key = Encoding.UTF8.GetBytes("oia3f€2dng8oa@asd65%dsf6m1zxep?");
+            //var key = Encoding.UTF8.GetBytes("oia3f€2dng8oa@asd65%dsf6m1zxep?");
 
-            services.AddAuthentication(options =>
+            //services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //}).AddJwtBearer(options =>
+            //{
+            //    options.RequireHttpsMetadata = false;
+            //    options.SaveToken = true;
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuerSigningKey = true,
+            //        IssuerSigningKey = new SymmetricSecurityKey(key),
+            //        ValidateIssuer = true,
+            //        ValidateAudience = true,
+            //        ValidateLifetime = true
+            //    };
+            //});
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, jwtBearerOptions =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
+                jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
                 {
-                    //ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    //ValidateIssuer = false,
-                    //ValidateAudience = false,
-                    ValidateLifetime = true
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes("oia3f€2dng8oa@asd65%dsf6m1zxep?")
+                    ),
+                    ValidIssuer = "MyServer",
+                    ValidAudience = "MyWebApp",
                 };
             });
         }

@@ -53,32 +53,49 @@ namespace ApiWeb.Controllers
 
 
             //Claims
-            var claims = new[]
+            //var claims = new[]
+            //{
+            //    new Claim(ClaimTypes.NameIdentifier, "aaa"),
+            //    new Claim(ClaimTypes.Email, "aaa")
+            //};
+            var claims = new Claim[]
             {
-                new Claim(ClaimTypes.Name, "aaa"),
-                new Claim(ClaimTypes.Email, "aaa")
+            new Claim(JwtRegisteredClaimNames.UniqueName, "aaa"),
             };
 
             //Payload
+            //var payload = new JwtPayload(
+            //    issuer: "https://localhost:44395/",
+            //    audience: "https://127.0.0.1/",
+            //    claims: claims,
+            //    notBefore: DateTime.Now,
+            //    expires: DateTime.Now.AddHours(1)
+            //);
+            ////var payload = new JwtPayload
+            ////(
+            //// "https://localhost:44395/",
+            //// "https://localhost:44395/",
+            ////claims
+            //// DateTime.UtcNow.AddMilliseconds(1), 
+            ////   DateTime.UtcNow.AddMinutes(2)
+            ////DateTime.Now,
+            ////DateTime.UtcNow.AddMinutes(2)
+            ////);
+            //var token = new JwtSecurityToken(header, payload);
+
+            //return new JwtSecurityTokenHandler().WriteToken(token);
+
+
+
             var payload = new JwtPayload(
-                issuer: "https://localhost:44395/",
-                audience: "https://127.0.0.1/",
+                issuer: "MyServer",
+                audience: "MyWebApp",
                 claims: claims,
                 notBefore: DateTime.Now,
                 expires: DateTime.Now.AddHours(1)
             );
-            //var payload = new JwtPayload
-            //(
-            // "https://localhost:44395/",
-            // "https://localhost:44395/",
-            //claims
-            // DateTime.UtcNow.AddMilliseconds(1), 
-            //   DateTime.UtcNow.AddMinutes(2)
-            //DateTime.Now,
-            //DateTime.UtcNow.AddMinutes(2)
-            //);
-            var token = new JwtSecurityToken(header, payload);
 
+            var token = new JwtSecurityToken(header, payload);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
         
