@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace apiweb
+namespace ApiWeb.Models
 {
     public class Customer
     {

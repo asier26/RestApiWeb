@@ -1,32 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using apiweb;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ApiWeb.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace apiweb.Data
+namespace ApiWeb.Data
 {
-    public class apiwebContext : DbContext
+    public class ApiWebContext : DbContext
     {
-        public apiwebContext()
+        public ApiWebContext()
         {
-
         }
-        public apiwebContext (DbContextOptions<apiwebContext> options)
+        public ApiWebContext (DbContextOptions<ApiWebContext> options)
             : base(options)
         {
-
         }
 
         public DbSet<Customer> Customer { get; set; }
+        public DbSet<User> User { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Customer>(entity =>
             {
+                //Customer Model
                 entity.ToTable("customer");
                 entity.HasKey(e => e.CustomerId);
                 entity.Property(e => e.CustomerId).HasColumnName("customerId");
@@ -74,8 +69,42 @@ namespace apiweb.Data
                 .HasColumnName("state")
                 .HasDefaultValueSql("((1))");
             });
+
+            //User Model
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("Users");
+                entity.HasKey(e => e.UserId);
+                entity.Property(e => e.UserId).HasColumnName("userId");
+                //crear propiedad como unica, no puede haber 2 nombres iguales
+                entity.Property(e => e.UserName)
+                .HasColumnName("name")
+                .IsRequired()
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+                entity.Property(e => e.Password)
+                .HasColumnName("password")
+                .IsRequired()
+                .HasMaxLength(30)
+                .IsUnicode(false);
+
+                entity.Property(e => e.Token)
+                .HasColumnName("token")
+                .HasMaxLength(300)
+                .IsUnicode(false);
+
+                entity.Property(e => e.UserValid)
+                .IsRequired()
+                .HasColumnName("isValid")
+                .HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.State)
+                .IsRequired()
+                .HasColumnName("state")
+                .HasDefaultValueSql("((1))");
+            });
         }
 
-        public DbSet<ApiWeb.Models.User> User { get; set; }
     }
 }

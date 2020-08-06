@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ApiWeb.Models
 {
@@ -12,10 +9,10 @@ namespace ApiWeb.Models
         [Required]
         public string UserName { get; set; }
         [DataType(DataType.Password)]
+        [Required]
         public string Password { get; set; }
-        public int Token { get; set; }
+        public string Token { get; set; }
         public bool UserValid { get; set; }
         public bool? State { get; set; }
-
     }
 }
