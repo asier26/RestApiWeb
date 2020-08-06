@@ -31,13 +31,14 @@ namespace ApiWeb
             services.AddControllers().AddNewtonsoftJson();
 
             //Configuracion del Token
+            string keySecret = this.Configuration.GetValue<string>("SecretKey");
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, jwtBearerOptions =>
             {
                 jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
                 {
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes("oia3f€2dng8oa@asd65%dsf6m1zxep?")//(Configuration["SecretKey"])
+                        Encoding.UTF8.GetBytes(keySecret)//(Configuration["SecretKey"])
                     ),
                     ValidIssuer = "MyServer",
                     ValidAudience = "MyWebApp",

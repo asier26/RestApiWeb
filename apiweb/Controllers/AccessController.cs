@@ -18,12 +18,12 @@ namespace ApiWeb.Controllers
     [ApiController]
     public class AccessController : ControllerBase
     {
-        //private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
         private readonly ApiWebContext _context;
         private User persistUser;
-        public AccessController(ApiWebContext context)
+        public AccessController(ApiWebContext context, IConfiguration configuration)
         {
-            //_configuration = configuration;
+            _configuration = configuration;
             _context = context;
         }
         [HttpPost]
@@ -33,15 +33,17 @@ namespace ApiWeb.Controllers
             {
                 //introducir el token en el usuario
                 var token = GenerateToken(user.UserName);
-                AnadirTokenAsync(token);
-                return Ok(new { token });
+                var correct = AnadirTokenAsync(token);
+                if (correct.Result) { 
+                    return Ok(new { token });
+                }
             }
             return NotFound();
         }
         
         private async Task<ActionResult<bool>> IsValidUserAsync(User user)
         {
-            //validacion del usuario //Falta añadir la conexion a la base de datos y comprobar
+            //validacion del usuario //añadir un switch arriba y devolver un numero en ver un boolean para cambiar la excepcion
             var userList = await _context.User.ToListAsync();
             foreach (var element in userList){
                 if (element.UserName.Equals(user.UserName))
@@ -64,22 +66,23 @@ namespace ApiWeb.Controllers
             _context.Entry(persistUser).State = EntityState.Modified;
             try
             {
-                await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync();
+                return result > 0;
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw;
+                return false;
             }
-            return true;
         }
 
         private string GenerateToken(string name)
         {
             //Header
+            string keySecret = this._configuration.GetValue<string>("SecretKey");
             var header = new JwtHeader(
             new SigningCredentials(
                 new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes("oia3f€2dng8oa@asd65%dsf6m1zxep?")//(_configuration["SecretKey"])
+                    Encoding.UTF8.GetBytes(keySecret)//("oia3f€2dng8oa@asd65%dsf6m1zxep?")//(_configuration["SecretKey"])
                 ),
                 SecurityAlgorithms.HmacSha256)
         );
