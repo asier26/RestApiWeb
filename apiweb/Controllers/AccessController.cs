@@ -11,6 +11,8 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.CodeAnalysis.Operations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace ApiWeb.Controllers
 {
@@ -29,21 +31,30 @@ namespace ApiWeb.Controllers
         [HttpPost]
         public IActionResult Authentication(User user)
         {
-            if (IsValidUserAsync(user).Result.Value)
+            int valor = IsValidUserAsync(user).Result.Value;
+            if (valor == 0)
             {
-                //introducir el token en el usuario
                 var token = GenerateToken(user.UserName);
                 var correct = AnadirTokenAsync(token);
                 if (correct.Result) { 
                     return Ok(new { token });
                 }
             }
-            return NotFound();
+            //segun la respues de IsValidUserAsync mostraremos un mensaje personalizado
+            switch (valor)
+            {
+                case 1:
+                    return Unauthorized();
+                case 2:
+                    return NotFound();
+                default:
+                    return BadRequest();
+            }
         }
         
-        private async Task<ActionResult<bool>> IsValidUserAsync(User user)
+        private async Task<ActionResult<int>> IsValidUserAsync(User user)
         {
-            //validacion del usuario //añadir un switch arriba y devolver un numero en ver un boolean para cambiar la excepcion
+            //validacion del usuario
             var userList = await _context.User.ToListAsync();
             foreach (var element in userList){
                 if (element.UserName.Equals(user.UserName))
@@ -51,13 +62,13 @@ namespace ApiWeb.Controllers
                     if (element.State.Value && element.UserValid && element.Password.Equals(user.Password))
                     {
                         persistUser = element;
-                        return true;
+                        return 0;
                     }
-                    ///else forbiden();
+                    else
+                        return 1;//forbiden();
                 }
-                //else NotFound();
             }
-            return false;
+            return 2;//NotFound();
         }
         //Añade el token al usuario en la bbdd
         private async Task<bool> AnadirTokenAsync(string token)
@@ -82,7 +93,7 @@ namespace ApiWeb.Controllers
             var header = new JwtHeader(
             new SigningCredentials(
                 new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(keySecret)//("oia3f€2dng8oa@asd65%dsf6m1zxep?")//(_configuration["SecretKey"])
+                    Encoding.UTF8.GetBytes(keySecret)
                 ),
                 SecurityAlgorithms.HmacSha256)
         );

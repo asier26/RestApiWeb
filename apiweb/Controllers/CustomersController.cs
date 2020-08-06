@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using ApiWeb.Data;
 using Microsoft.AspNetCore.Authorization;
 using ApiWeb.Models;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace ApiWeb.Controllers
 {
@@ -16,30 +19,43 @@ namespace ApiWeb.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly ApiWebContext _context;
-
-        public CustomersController(ApiWebContext context)
+        private readonly IDistributedCache _distributedCache;
+        private readonly string CACHEKEY = "customerslist";
+        public CustomersController(ApiWebContext context, IDistributedCache distributedCache)
         {
             _context = context;
+            _distributedCache = distributedCache;
         }
 
         // GET: api/Customers/GetAllCustomers 
         [HttpGet("GetAllCustomers")]
-        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomer()
+        public async Task<IEnumerable<Customer>> GetCustomer()
         {
-            return await _context.Customer.ToListAsync();
+            string customersList = await _distributedCache.GetStringAsync(CACHEKEY);
+            if (customersList == null)
+            {
+                return null;
+            }
+            return JsonConvert.DeserializeObject<IEnumerable<Customer>>(customersList);
+            //return await _context.Customer.ToListAsync();
         }
 
         // GET: api/Customers/GetCustomerData/5
         [HttpGet("GetCustomerData/{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
-            var customer = await _context.Customer.FindAsync(id);
-
-            if (customer == null)
+            var customersList = JsonConvert.DeserializeObject<IEnumerable<Customer>>(await _distributedCache.GetStringAsync(CACHEKEY));
+            if (customersList == null)
             {
                 return NotFound();
             }
-
+            Customer customer = new Customer();
+            foreach (Customer c in customersList)
+            {
+                if (c.CustomerId.Equals(id))
+                    customer = c;
+            }
+            //var customer = await _context.Customer.FindAsync(id);
             return customer;
         }
 
@@ -52,12 +68,19 @@ namespace ApiWeb.Controllers
             _context.Customer.Add(customer);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
+            var response = CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
+            CacheUpdate();
+            return response;
         }
-        
-        //private bool CustomerExists(int id)
-        //{
-        //    return _context.Customer.Any(e => e.CustomerId == id);
-        //}
+
+        public async void CacheUpdate()
+        {
+            //Metodo que almacena los datos en Redis Cache
+            var customerList = await _context.Customer.ToListAsync();
+            var options = new DistributedCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromMinutes(5))
+                .SetAbsoluteExpiration(DateTime.Now.AddHours(6));
+            await _distributedCache.SetStringAsync(CACHEKEY, JsonConvert.SerializeObject(customerList), options);
+        }
     }
 }
