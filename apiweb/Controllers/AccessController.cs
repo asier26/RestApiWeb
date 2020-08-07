@@ -7,8 +7,12 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using ApiWeb.Data;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.CodeAnalysis.Operations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace ApiWeb.Controllers
 {
@@ -39,9 +43,12 @@ namespace ApiWeb.Controllers
             //segun la respues de IsValidUserAsync mostraremos un mensaje personalizado
             switch (valor)
             {
-                case 1: return Unauthorized();
-                case 2: return NotFound();
-                default: return BadRequest();
+                case 1:
+                    return Unauthorized();
+                case 2:
+                    return NotFound();
+                default:
+                    return BadRequest();
             }
         }
         

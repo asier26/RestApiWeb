@@ -37,6 +37,7 @@ namespace ApiWeb.Controllers
                 return null;
             }
             return JsonConvert.DeserializeObject<IEnumerable<Customer>>(customersList);
+            //return await _context.Customer.ToListAsync();
         }
 
         // GET: api/Customers/GetCustomerData/5
@@ -54,10 +55,13 @@ namespace ApiWeb.Controllers
                 if (c.CustomerId.Equals(id))
                     customer = c;
             }
+            //var customer = await _context.Customer.FindAsync(id);
             return customer;
         }
 
         // POST: api/Customers/CreateCustomer
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("CreateCustomer")]
         public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
@@ -74,7 +78,7 @@ namespace ApiWeb.Controllers
             //Metodo que almacena los datos en Redis Cache
             var customerList = await _context.Customer.ToListAsync();
             var options = new DistributedCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromMinutes(60))
+                .SetSlidingExpiration(TimeSpan.FromMinutes(5))
                 .SetAbsoluteExpiration(DateTime.Now.AddHours(6));
             await _distributedCache.SetStringAsync(CACHEKEY, JsonConvert.SerializeObject(customerList), options);
         }

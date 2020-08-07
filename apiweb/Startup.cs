@@ -30,7 +30,7 @@ namespace ApiWeb
                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers().AddNewtonsoftJson();
 
-            //Configuracion del Token
+            //Comprobación del Token
             string keySecret = this.Configuration.GetValue<string>("SecretKey");
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, jwtBearerOptions =>
@@ -38,7 +38,7 @@ namespace ApiWeb
                 jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters
                 {
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(keySecret)//(Configuration["SecretKey"])
+                        Encoding.UTF8.GetBytes(keySecret)
                     ),
                     ValidIssuer = "MyServer",
                     ValidAudience = "MyWebApp",
@@ -46,6 +46,11 @@ namespace ApiWeb
                     ValidateAudience = true,
                     ValidateLifetime = true
                 };
+            });
+            //Redis cache
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
             });
         }
 
